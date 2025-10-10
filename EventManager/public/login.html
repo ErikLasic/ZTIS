@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prijava - EventManager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎉 EventManager</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="/">Domov</a></li>
+                        <li><a href="/register">Registracija</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <h2 class="auth-title">Prijava v sistem</h2>
+        
+        <div id="alertContainer"></div>
+        
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Email naslov</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="geslo">Geslo</label>
+                <input type="password" id="geslo" name="geslo" class="form-control" required>
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Prijavi se</button>
+        </form>
+
+        <div class="auth-link">
+            <p>Nimate še računa? <a href="/register">Registrirajte se</a></p>
+        </div>
+
+        <div style="margin-top: 2rem; padding: 1rem; background: #e9ecef; border-radius: 5px; font-size: 0.9rem;">
+            <strong>Testni dostopi:</strong><br>
+            Admin: <code>admin@eventmanager.si</code> / <code>admin123</code><br>
+            Uporabnik: <code>janez@test.si</code> / <code>test123</code><br>
+            <code>maja@test.si</code> / <code>test123</code><br>
+            <code>peter@test.si</code> / <code>test123</code>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('Uspešna prijava! Preusmerjam...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showAlert(result.error || 'Napaka pri prijavi', 'error');
+                }
+            } catch (error) {
+                console.error('Napaka:', error);
+                showAlert('Prišlo je do napake pri komunikaciji s strežnikom', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administrator - EventManager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎉 EventManager</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="/">Domov</a></li>
+                        <li><a href="/dashboard">Dogodki</a></li>
+                        <li><a href="/admin" class="active">Admin</a></li>
+                    </ul>
+                </nav>
+                <div class="user-info">
+                    <span class="user-name" id="userName">Admin</span>
+                    <button class="btn btn-outline btn-small" id="logoutBtn">Odjava</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-title">Administratorska plošča</div>
+            
+            <div id="alertContainer"></div>
+
+            <!-- Statistike -->
+            <div class="section-title">Sistemske statistike</div>
+            <div class="stats-grid" id="statsContainer">
+                <div class="loading">Nalagam statistike...</div>
+            </div>
+
+            <!-- Navigacijske zavihki -->
+            <div class="nav-tabs" style="margin-bottom: 2rem;">
+                <button class="btn btn-secondary tab-btn active" data-tab="users">Uporabniki</button>
+                <button class="btn btn-secondary tab-btn" data-tab="events">Vsi dogodki</button>
+                <button class="btn btn-secondary tab-btn" data-tab="registrations">Vse prijave</button>
+                <button class="btn btn-secondary tab-btn" data-tab="activity">Aktivnost</button>
+            </div>
+
+            <!-- Vsebina zavihkov -->
+            <div id="users" class="tab-content active">
+                <div class="section-title">Upravljanje uporabnikov</div>
+                <div id="usersContainer">
+                    <div class="loading">Nalagam uporabnike...</div>
+                </div>
+            </div>
+
+            <div id="events" class="tab-content hidden">
+                <div class="section-title">Vsi dogodki v sistemu</div>
+                <div id="eventsContainer">
+                    <div class="loading">Nalagam dogodke...</div>
+                </div>
+            </div>
+
+            <div id="registrations" class="tab-content hidden">
+                <div class="section-title">Vse prijave v sistemu</div>
+                <div id="registrationsContainer">
+                    <div class="loading">Nalagam prijave...</div>
+                </div>
+            </div>
+
+            <div id="activity" class="tab-content hidden">
+                <div class="section-title">Nedavna aktivnost</div>
+                <div id="activityContainer">
+                    <div class="loading">Nalagam aktivnost...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="/js/common.js"></script>
+    <script src="/js/admin.js"></script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EventManager - Sistem za vodenje prijav na dogodke</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎉 EventManager</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="/" class="active">Domov</a></li>
+                        <li><a href="/dashboard">Dogodki</a></li>
+                        <li><a href="/login">Prijava</a></li>
+                        <li><a href="/register">Registracija</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <div class="container">
+            <div class="page-title">
+                Dobrodošli v EventManager
+            </div>
+            
+            <div class="grid grid-2">
+                <div class="card">
+                    <h3>🎯 O sistemu</h3>
+                    <p>EventManager je preprost in učinkovit sistem za organizacijo dogodkov. 
+                    Omogoča vam ustvarjanje dogodkov, upravljanje prijav in pregled statistik.</p>
+                    
+                    <h4 style="margin-top: 1.5rem; margin-bottom: 0.5rem;">Ključne funkcionalnosti:</h4>
+                    <ul style="margin-left: 1.5rem; line-height: 1.8;">
+                        <li>Registracija in prijava uporabnikov</li>
+                        <li>Ustvarjanje in upravljanje dogodkov</li>
+                        <li>Prijavljanje na dogodke</li>
+                        <li>Iskanje dogodkov po kriterijih</li>
+                        <li>Administrator panel</li>
+                        <li>Email obvestila (simulirana)</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <h3>🚀 Začetek dela</h3>
+                    <p>Za uporabo sistema se najprej registrirajte ali prijavite z obstoječimi podatki.</p>
+                    
+                    <div class="card-actions" style="margin-top: 1.5rem;">
+                        <a href="/register" class="btn btn-primary">Registracija</a>
+                        <a href="/login" class="btn btn-secondary">Prijava</a>
+                    </div>
+
+                    <div style="margin-top: 2rem; padding: 1rem; background: #f8f9fa; border-radius: 5px;">
+                        <strong>Testni dostopi:</strong><br>
+                        Admin: <code>admin@eventmanager.si</code> / <code>admin123</code><br>
+                        Uporabnik: <code>janez@test.si</code> / <code>test123</code>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title" style="margin-top: 3rem;">
+                Prihajajočih dogodkov
+            </div>
+            
+            <div id="upcomingEvents" class="grid grid-3">
+                <div class="loading">Nalagam dogodke...</div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 EventManager - Sistem za vodenje prijav na dogodke | Projekt za predmet ZTIS</p>
+        </div>
+    </footer>
+
+    <script src="/js/common.js"></script>
+    <script>
+        // Naloži prihajajoče dogodke na domači strani
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/api/events')
+                .then(response => response.json())
+                .then(events => {
+                    const container = document.getElementById('upcomingEvents');
+                    
+                    if (events.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: #6c757d;">Trenutno ni aktivnih dogodkov.</p>';
+                        return;
+                    }
+
+                    // Prikaži samo naslednje 6 dogodkov
+                    const upcomingEvents = events
+                        .filter(event => new Date(event.datum + ' ' + (event.cas || '00:00')) >= new Date())
+                        .slice(0, 6);
+
+                    if (upcomingEvents.length === 0) {
+                        container.innerHTML = '<p style="text-align: center; color: #6c757d;">Trenutno ni prihajajočih dogodkov.</p>';
+                        return;
+                    }
+
+                    container.innerHTML = upcomingEvents.map(event => `
+                        <div class="card">
+                            <h3>${event.ime}</h3>
+                            <div class="card-meta">
+                                📅 ${formatDate(event.datum)} ${event.cas ? '🕐 ' + event.cas : ''}<br>
+                                📍 ${event.lokacija}<br>
+                                👤 Organizator: ${event.organizator_ime} ${event.organizator_priimek}<br>
+                                👥 Prijavljenih: ${event.stevilo_prijavljenih}${event.maxUdelezenci ? '/' + event.maxUdelezenci : ''}
+                            </div>
+                            ${event.opis ? `<p>${event.opis}</p>` : ''}
+                            <div class="card-actions">
+                                <a href="/dashboard" class="btn btn-primary btn-small">Poglej dogodke</a>
+                            </div>
+                        </div>
+                    `).join('');
+                })
+                .catch(error => {
+                    console.error('Napaka pri nalaganju dogodkov:', error);
+                    document.getElementById('upcomingEvents').innerHTML = 
+                        '<p style="text-align: center; color: #dc3545;">Napaka pri nalaganju dogodkov.</p>';
+                });
+        });
+    </script>
+</body>
+</html>

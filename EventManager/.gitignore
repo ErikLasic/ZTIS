@@ -1,0 +1,58 @@
+# ---- Node.js ----
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Build/output caches
+.dist/
+dist/
+build/
+out/
+.tmp/
+tmp/
+temp/
+.cache/
+.parcel-cache/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# ---- SQLite databases ----
+# Ignore local dev/test databases and WAL/SHM sidecars
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+# Explicitly ignore the local DB file used by this project
+/database.db
+
+# ---- Editor/OS junk ----
+# VS Code
+.vscode/
+
+# JetBrains
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# ESLint cache
+.eslintcache

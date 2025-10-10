@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registracija - EventManager</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🎉 EventManager</h1>
+                </div>
+                <nav class="nav">
+                    <ul>
+                        <li><a href="/">Domov</a></li>
+                        <li><a href="/login">Prijava</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <div class="auth-container">
+        <h2 class="auth-title">Registracija novega uporabnika</h2>
+        
+        <div id="alertContainer"></div>
+        
+        <form id="registerForm">
+            <div class="form-group">
+                <label for="ime">Ime *</label>
+                <input type="text" id="ime" name="ime" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="priimek">Priimek *</label>
+                <input type="text" id="priimek" name="priimek" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="email">Email naslov *</label>
+                <input type="email" id="email" name="email" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+                <label for="geslo">Geslo *</label>
+                <input type="password" id="geslo" name="geslo" class="form-control" required minlength="6">
+                <small style="color: #6c757d;">Geslo mora imeti vsaj 6 znakov</small>
+            </div>
+
+            <div class="form-group">
+                <label for="ponoviGeslo">Ponovi geslo *</label>
+                <input type="password" id="ponoviGeslo" name="ponoviGeslo" class="form-control" required minlength="6">
+            </div>
+
+            <button type="submit" class="btn btn-primary" style="width: 100%;">Registriraj se</button>
+        </form>
+
+        <div class="auth-link">
+            <p>Že imate račun? <a href="/login">Prijavite se</a></p>
+        </div>
+    </div>
+
+    <script src="/js/common.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData);
+            
+            // Preveri, če se gesli ujemata
+            if (data.geslo !== data.ponoviGeslo) {
+                showAlert('Gesli se ne ujemata', 'error');
+                return;
+            }
+            
+            // Odstrani ponoviGeslo iz podatkov
+            delete data.ponoviGeslo;
+            
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showAlert('Uspešna registracija! Preusmerjam...', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 1000);
+                } else {
+                    showAlert(result.error || 'Napaka pri registraciji', 'error');
+                }
+            } catch (error) {
+                console.error('Napaka:', error);
+                showAlert('Prišlo je do napake pri komunikaciji s strežnikom', 'error');
+            }
+        });
+
+        // Preverjanje ujemanja gesel v realnem času
+        document.getElementById('ponoviGeslo').addEventListener('input', function() {
+            const geslo = document.getElementById('geslo').value;
+            const ponoviGeslo = this.value;
+            
+            if (ponoviGeslo && geslo !== ponoviGeslo) {
+                this.style.borderColor = '#dc3545';
+            } else {
+                this.style.borderColor = '#e9ecef';
+            }
+        });
+    </script>
+</body>
+</html>
