@@ -4,9 +4,10 @@
   "description": "Sistem za vodenje prijav na dogodke - EventManager",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
+    "start": "node start.js",
     "dev": "nodemon server.js",
     "init-db": "node init-db.js",
+    "server": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

@@ -29,13 +29,13 @@ git push -u origin main
 
 2. Click **New +** → **Web Service**
 
-3. Connect your GitHub repo and select `EventManager`
+3. Connect your GitHub repo and select `ZTIS`
 
 4. Configure (most fields auto-detect):
    - **Name**: eventmanager (or your choice)
    - **Region**: Frankfurt (or closest to you)
    - **Branch**: main
-   - **Root Directory**: (leave blank)
+   - **Root Directory**: `EventManager` ⚠️ **IMPORTANT!**
    - **Runtime**: Node
    - **Build Command**: `npm install`
    - **Start Command**: `npm start`
@@ -49,17 +49,14 @@ git push -u origin main
 
 7. Wait ~3-5 minutes for deployment
 
-### Step 3: Initialize Database (One-time)
+### Step 3: Database Auto-Initializes! 🎉
 
-After first deployment:
-
-1. In Render dashboard, go to your service
-2. Click **Shell** tab (in the left sidebar)
-3. Run this command:
-   ```bash
-   npm run init-db
-   ```
-4. You should see "Baza podatkov je uspešno inicializirana!"
+The database now initializes automatically on first startup! Check the deployment logs in Render - you should see:
+```
+🔧 Running database initialization...
+✅ Database initialized successfully
+🌐 Starting Express server...
+```
 
 ### Step 4: Test Your Site
 
@@ -78,12 +75,12 @@ Test login:
 - The service restarts after 15 minutes of inactivity
 - You manually restart the service
 
-**Solutions:**
-1. **Quick fix**: Just re-run `npm run init-db` in the Shell when data is lost
+**Good News:** The database automatically re-initializes with test data on every restart! No manual steps needed.
+
+**Solutions for persistent data:**
+1. **For demos/course projects**: Current setup is perfect - auto re-initializes
 2. **Permanent fix** (costs $7/month): Upgrade to Render's persistent disk
 3. **Better fix** (still free): Migrate to a hosted database (I can help if needed)
-
-For a course project/demo, option #1 is totally fine!
 
 ### Auto-Sleep on Free Tier
 
@@ -95,11 +92,13 @@ Free Render services sleep after 15 minutes of inactivity. First request after s
 - Make sure `package.json` has all dependencies
 - Check Build Command is `npm install`
 
-**Database not found error**
-- Run `npm run init-db` in the Render Shell
+**Database tables not found error**
+- Check deployment logs - database should auto-initialize
+- If initialization failed, check logs for errors
 
 **Session issues / can't login**
 - Make sure SESSION_SECRET environment variable is set
+- Database might not be initialized - check logs
 
 ## Alternative: Paid Hosting with Persistence
 
