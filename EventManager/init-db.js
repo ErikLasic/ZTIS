@@ -79,59 +79,62 @@ db.serialize(() => {
         }
     });
 
-    // Ustvari testnega administratorja
+    // Ustvari testnega administratorja in uporabnike
     const adminEmail = 'admin@eventmanager.si';
     const adminPassword = 'admin123';
     
-    bcrypt.hash(adminPassword, 10, (err, hashedPassword) => {
-        if (err) {
-            console.error('Napaka pri hash-anju gesla:', err.message);
-            return;
-        }
-
-        db.run(`INSERT OR IGNORE INTO users (email, geslo, ime, priimek, isAdmin) 
-                VALUES (?, ?, ?, ?, ?)`, 
-                [adminEmail, hashedPassword, 'Admin', 'Administrator', 1], 
-                function(err) {
-                    if (err) {
-                        console.error('Napaka pri ustvarjanju admin uporabnika:', err.message);
-                    } else if (this.changes > 0) {
-                        console.log('✓ Admin uporabnik ustvarjen:', adminEmail, '/ geslo:', adminPassword);
-                    } else {
-                        console.log('→ Admin uporabnik že obstaja');
-                    }
-                });
-    });
-
-    // Ustvari nekaj testnih uporabnikov
     const testUsers = [
-        { email: 'janez@test.si', geslo: 'test123', ime: 'Janez', priimek: 'Novak' },
-        { email: 'maja@test.si', geslo: 'test123', ime: 'Maja', priimek: 'Kovač' },
-        { email: 'peter@test.si', geslo: 'test123', ime: 'Peter', priimek: 'Kranjc' }
+        { email: 'janez@test.si', geslo: 'test123', ime: 'Janez', priimek: 'Novak', isAdmin: 0 },
+        { email: 'maja@test.si', geslo: 'test123', ime: 'Maja', priimek: 'Kovač', isAdmin: 0 },
+        { email: 'peter@test.si', geslo: 'test123', ime: 'Peter', priimek: 'Kranjc', isAdmin: 0 }
     ];
 
-    testUsers.forEach(user => {
-        bcrypt.hash(user.geslo, 10, (err, hashedPassword) => {
-            if (err) {
-                console.error('Napaka pri hash-anju gesla:', err.message);
-                return;
-            }
-
-            db.run(`INSERT OR IGNORE INTO users (email, geslo, ime, priimek) 
-                    VALUES (?, ?, ?, ?)`, 
-                    [user.email, hashedPassword, user.ime, user.priimek], 
+    // Use Promise.all to wait for all user creations
+    const createUsers = async () => {
+        // Create admin first
+        const adminHash = await bcrypt.hash(adminPassword, 10);
+        await new Promise((resolve, reject) => {
+            db.run(`INSERT OR IGNORE INTO users (email, geslo, ime, priimek, isAdmin) 
+                    VALUES (?, ?, ?, ?, ?)`, 
+                    [adminEmail, adminHash, 'Admin', 'Administrator', 1], 
                     function(err) {
                         if (err) {
-                            console.error('Napaka pri ustvarjanju uporabnika:', err.message);
+                            console.error('Napaka pri ustvarjanju admin uporabnika:', err.message);
+                            reject(err);
                         } else if (this.changes > 0) {
-                            console.log(`✓ Testni uporabnik ustvarjen: ${user.email}`);
+                            console.log('✓ Admin uporabnik ustvarjen:', adminEmail, '/ geslo:', adminPassword);
+                            resolve();
+                        } else {
+                            console.log('→ Admin uporabnik že obstaja');
+                            resolve();
                         }
                     });
         });
-    });
 
-    // Ustvari nekaj testnih dogodkov
-    setTimeout(() => {
+        // Create test users
+        for (const user of testUsers) {
+            const hash = await bcrypt.hash(user.geslo, 10);
+            await new Promise((resolve, reject) => {
+                db.run(`INSERT OR IGNORE INTO users (email, geslo, ime, priimek, isAdmin) 
+                        VALUES (?, ?, ?, ?, ?)`, 
+                        [user.email, hash, user.ime, user.priimek, user.isAdmin], 
+                        function(err) {
+                            if (err) {
+                                console.error('Napaka pri ustvarjanju uporabnika:', err.message);
+                                reject(err);
+                            } else if (this.changes > 0) {
+                                console.log(`✓ Testni uporabnik ustvarjen: ${user.email}`);
+                                resolve();
+                            } else {
+                                resolve();
+                            }
+                        });
+            });
+        }
+    };
+
+    // Wait for users to be created, then create events
+    createUsers().then(() => {
         const testEvents = [
             {
                 ime: 'Tehnološka konferenca 2025',
@@ -186,5 +189,8 @@ db.serialize(() => {
             }
             console.log('Povezava z bazo je zaprta.');
         });
-    }, 1000); // Počakaj 1 sekundo, da se uporabniki ustvarijo
+    }).catch(err => {
+        console.error('Napaka pri inicializaciji uporabnikov:', err);
+        db.close();
+    });
 });
