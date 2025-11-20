@@ -26,6 +26,17 @@ npm run dev
 
 Aplikacija bo dostopna na http://localhost:3000
 
+## Deployment
+
+Za enostavno objavo aplikacije na spletu (brez sprememb kode):
+
+1. Pushaj kodo na GitHub
+2. Prijavi se na [Render.com](https://render.com)
+3. Ustvari nov Web Service in poveži z repozitorijem
+4. Po prvem deploymentu poženi `npm run init-db` v Render Shell
+
+Podrobna navodila: `DEPLOYMENT_SIMPLE.md`
+
 ## Funkcionalnosti
 
 1. Registracija uporabnikov
